@@ -3,7 +3,7 @@ const path = require('path');
 
 // Load and parse the CSV file
 function loadBattenUsers() {
-  const csvPath = path.join(__dirname, '../../groupExportAll_FBS_Community.csv');
+  const csvPath = path.join(__dirname, 'groupExportAll_FBS_Community.csv');
 
   try {
     const csvContent = fs.readFileSync(csvPath, 'utf-8');
