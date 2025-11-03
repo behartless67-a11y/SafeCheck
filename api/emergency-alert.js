@@ -1,8 +1,19 @@
 const { loadBattenUsers } = require('./load-users');
-const { kv } = require('@vercel/kv');
 
 // Load users once at cold start
 const authorizedUsers = loadBattenUsers();
+
+// Try to load KV, fallback to in-memory if not available
+let kv;
+let inMemoryAlerts = [];
+let alertCount = 0;
+
+try {
+  kv = require('@vercel/kv').kv;
+} catch (e) {
+  console.warn('KV not available, using in-memory storage');
+  kv = null;
+}
 
 module.exports = async (req, res) => {
   // Enable CORS
@@ -40,32 +51,52 @@ module.exports = async (req, res) => {
       });
     }
 
-    // Get current alert count for ID generation
-    const alertCount = await kv.get('alert_count') || 0;
-    const newAlertId = alertCount + 1;
-
     // Store check-in
-    const alert = {
-      id: newAlertId,
-      computingId: user.uid,
-      name,
-      email: user.email,
-      location,
-      notes,
-      timestamp: timestamp || new Date().toISOString(),
-      receivedAt: new Date().toISOString()
-    };
+    let newAlertId;
 
-    // Save to KV storage
-    await kv.lpush('alerts', JSON.stringify(alert));
-    await kv.set('alert_count', newAlertId);
+    if (kv && process.env.KV_REST_API_URL) {
+      // Use KV storage
+      const currentCount = await kv.get('alert_count') || 0;
+      newAlertId = currentCount + 1;
 
-    console.log(`Check-in recorded for ${name} at ${location} (ID: ${alert.id})`);
+      const alert = {
+        id: newAlertId,
+        computingId: user.uid,
+        name,
+        email: user.email,
+        location,
+        notes,
+        timestamp: timestamp || new Date().toISOString(),
+        receivedAt: new Date().toISOString()
+      };
+
+      await kv.lpush('alerts', JSON.stringify(alert));
+      await kv.set('alert_count', newAlertId);
+    } else {
+      // Fallback to in-memory storage
+      alertCount++;
+      newAlertId = alertCount;
+
+      const alert = {
+        id: newAlertId,
+        computingId: user.uid,
+        name,
+        email: user.email,
+        location,
+        notes,
+        timestamp: timestamp || new Date().toISOString(),
+        receivedAt: new Date().toISOString()
+      };
+
+      inMemoryAlerts.push(alert);
+    }
+
+    console.log(`Check-in recorded for ${name} at ${location} (ID: ${newAlertId})`);
 
     res.json({
       success: true,
       message: 'Location check-in recorded successfully',
-      alertId: alert.id
+      alertId: newAlertId
     });
 
   } catch (error) {

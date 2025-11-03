@@ -1,4 +1,11 @@
-const { kv } = require('@vercel/kv');
+// Try to load KV, fallback to in-memory if not available
+let kv;
+try {
+  kv = require('@vercel/kv').kv;
+} catch (e) {
+  console.warn('KV not available, using in-memory storage');
+  kv = null;
+}
 
 module.exports = async (req, res) => {
   // Enable CORS
@@ -17,12 +24,19 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Fetch all alerts from KV storage
-    const alertStrings = await kv.lrange('alerts', 0, -1);
-    const alerts = alertStrings.map(str => JSON.parse(str));
+    let alerts = [];
 
-    // Sort by timestamp (most recent first)
-    alerts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    if (kv && process.env.KV_REST_API_URL) {
+      // Fetch from KV storage
+      const alertStrings = await kv.lrange('alerts', 0, -1);
+      alerts = alertStrings.map(str => JSON.parse(str));
+
+      // Sort by timestamp (most recent first)
+      alerts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    } else {
+      // Return empty array with note about in-memory storage
+      alerts = [];
+    }
 
     res.json({ alerts });
   } catch (error) {
