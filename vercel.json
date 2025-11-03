@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/validate-user",
+      "dest": "/api/validate-user.js"
+    },
+    {
+      "src": "/api/emergency-alert",
+      "dest": "/api/emergency-alert.js"
+    },
+    {
+      "src": "/api/alerts",
+      "dest": "/api/alerts.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
+    }
+  ],
+  "rewrites": [
+    { "source": "/", "destination": "/public/index.html" },
+    { "source": "/admin", "destination": "/public/admin.html" }
+  ]
+}

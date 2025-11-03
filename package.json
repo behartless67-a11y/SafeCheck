@@ -1,0 +1,15 @@
+{
+  "name": "batten-safecheck",
+  "version": "1.0.0",
+  "description": "Batten School SafeCheck - Location Check-in System",
+  "main": "api/validate-user.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.x"
+  }
+}
