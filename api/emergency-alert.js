@@ -1,11 +1,8 @@
 const { loadBattenUsers } = require('./load-users');
+const { kv } = require('@vercel/kv');
 
 // Load users once at cold start
 const authorizedUsers = loadBattenUsers();
-
-// In-memory storage (NOTE: This will reset on each deployment and cold start)
-// For production, you'd want to use a database like Vercel KV, Postgres, etc.
-let alerts = [];
 
 module.exports = async (req, res) => {
   // Enable CORS
@@ -43,9 +40,13 @@ module.exports = async (req, res) => {
       });
     }
 
+    // Get current alert count for ID generation
+    const alertCount = await kv.get('alert_count') || 0;
+    const newAlertId = alertCount + 1;
+
     // Store check-in
     const alert = {
-      id: alerts.length + 1,
+      id: newAlertId,
       computingId: user.uid,
       name,
       email: user.email,
@@ -54,7 +55,10 @@ module.exports = async (req, res) => {
       timestamp: timestamp || new Date().toISOString(),
       receivedAt: new Date().toISOString()
     };
-    alerts.push(alert);
+
+    // Save to KV storage
+    await kv.lpush('alerts', JSON.stringify(alert));
+    await kv.set('alert_count', newAlertId);
 
     console.log(`Check-in recorded for ${name} at ${location} (ID: ${alert.id})`);
 

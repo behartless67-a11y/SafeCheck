@@ -1,6 +1,4 @@
-// NOTE: Since serverless functions are stateless, we can't share the alerts array
-// between emergency-alert.js and this file. For production, use a database.
-// For now, this is a placeholder that returns empty alerts.
+const { kv } = require('@vercel/kv');
 
 module.exports = async (req, res) => {
   // Enable CORS
@@ -18,10 +16,20 @@ module.exports = async (req, res) => {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // NOTE: In production, fetch from database
-  // For now, returning empty array since serverless functions can't share state
-  res.json({
-    alerts: [],
-    note: 'In-memory storage on serverless - alerts reset on cold start. Use a database for production.'
-  });
+  try {
+    // Fetch all alerts from KV storage
+    const alertStrings = await kv.lrange('alerts', 0, -1);
+    const alerts = alertStrings.map(str => JSON.parse(str));
+
+    // Sort by timestamp (most recent first)
+    alerts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    res.json({ alerts });
+  } catch (error) {
+    console.error('Error fetching alerts:', error);
+    res.status(500).json({
+      error: 'Failed to fetch alerts',
+      alerts: []
+    });
+  }
 };
