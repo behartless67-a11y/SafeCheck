@@ -6,7 +6,7 @@ function loadStaffAndFaculty() {
   const staffSet = new Set();
 
   // Load staff CSV
-  const staffCsvPath = path.join(__dirname, '..', 'groupExportAll_FBS_StaffAll.csv');
+  const staffCsvPath = path.join(__dirname, 'groupExportAll_FBS_StaffAll.csv');
 
   try {
     if (fs.existsSync(staffCsvPath)) {
@@ -42,7 +42,7 @@ function loadStaffAndFaculty() {
   ];
 
   facultyFiles.forEach(fileName => {
-    const facultyCsvPath = path.join(__dirname, '..', fileName);
+    const facultyCsvPath = path.join(__dirname, fileName);
 
     try {
       if (fs.existsSync(facultyCsvPath)) {
