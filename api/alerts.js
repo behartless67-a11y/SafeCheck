@@ -31,8 +31,14 @@ module.exports = async (req, res) => {
 
     if (kv && process.env.KV_REST_API_URL) {
       // Fetch from KV storage
-      const alertStrings = await kv.lrange('alerts', 0, -1);
-      alerts = alertStrings.map(str => JSON.parse(str));
+      const alertData = await kv.lrange('alerts', 0, -1);
+      alerts = alertData.map(item => {
+        // Handle both string and object responses from KV
+        if (typeof item === 'string') {
+          return JSON.parse(item);
+        }
+        return item;
+      });
 
       // Sort by timestamp (most recent first)
       alerts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));

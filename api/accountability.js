@@ -40,8 +40,14 @@ module.exports = async (req, res) => {
 
     if (kv && process.env.KV_REST_API_URL) {
       // Use KV storage
-      const alertStrings = await kv.lrange('alerts', 0, -1);
-      alerts = alertStrings.map(str => JSON.parse(str));
+      const alertData = await kv.lrange('alerts', 0, -1);
+      alerts = alertData.map(item => {
+        // Handle both string and object responses from KV
+        if (typeof item === 'string') {
+          return JSON.parse(item);
+        }
+        return item;
+      });
     } else {
       // Use in-memory storage
       alerts = getInMemoryAlerts();
