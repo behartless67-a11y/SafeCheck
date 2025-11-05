@@ -185,6 +185,15 @@
             background: #cc6600;
         }
 
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -344,6 +353,7 @@
                     <span id="refreshText">&#8635; Refresh</span>
                 </button>
                 <button class="btn btn-secondary" id="exportBtn">&#8595; Export CSV</button>
+                <button class="btn btn-danger" id="clearBtn">&#10006; Clear All Data</button>
             </div>
 
             <div id="content">
@@ -501,6 +511,36 @@
             a.download = `batten-safecheck-${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
             window.URL.revokeObjectURL(url);
+        });
+
+        // Clear all data button
+        document.getElementById('clearBtn').addEventListener('click', async () => {
+            const confirmed = confirm('Are you sure you want to clear ALL check-in data? This cannot be undone!');
+            if (!confirmed) return;
+
+            const doubleConfirm = confirm('This will permanently delete all ' + allCheckIns.length + ' check-ins. Are you absolutely sure?');
+            if (!doubleConfirm) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/clear-data`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('All data has been cleared successfully!');
+                    await loadCheckIns();
+                } else {
+                    alert('Error: ' + (result.error || 'Failed to clear data'));
+                }
+            } catch (error) {
+                console.error('Error clearing data:', error);
+                alert('Failed to clear data. Please try again.');
+            }
         });
 
         // Auto-refresh every 30 seconds
