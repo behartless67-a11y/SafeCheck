@@ -310,6 +310,12 @@
             <div class="divider"></div>
         </div>
 
+        <div style="text-align: center; margin-bottom: 30px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <a href="admin.html" style="padding: 12px 24px; background: #232D4B; color: white; border-radius: 8px; text-decoration: none; font-weight: 600;">&#9776; Check-ins Dashboard</a>
+            <a href="accountability.html" style="padding: 12px 24px; background: #E57200; color: white; border-radius: 8px; text-decoration: none; font-weight: 600;">&#9745; Accountability Report</a>
+            <a href="index.html" style="padding: 12px 24px; background: #6c757d; color: white; border-radius: 8px; text-decoration: none; font-weight: 600;">&#8592; Back to Check-in</a>
+        </div>
+
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-label">Total Check-ins</div>
@@ -335,9 +341,9 @@
                     <input type="text" id="searchInput" placeholder="Search by name, computing ID, or location...">
                 </div>
                 <button class="btn btn-primary" id="refreshBtn">
-                    <span id="refreshText">🔄 Refresh</span>
+                    <span id="refreshText">&#8635; Refresh</span>
                 </button>
-                <button class="btn btn-secondary" id="exportBtn">📥 Export CSV</button>
+                <button class="btn btn-secondary" id="exportBtn">&#8595; Export CSV</button>
             </div>
 
             <div id="content">
@@ -351,8 +357,10 @@
 
     <script>
         // Auto-detect API URL based on environment
-        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname.includes('192.168') || window.location.hostname.includes('172.')
-            ? 'http://172.18.8.179:3000'  // Local development
+        const API_BASE = window.location.hostname === 'localhost'
+            ? 'http://localhost:3000'  // Local development
+            : window.location.hostname.includes('192.168') || window.location.hostname.includes('172.')
+            ? `http://${window.location.hostname}:3000`  // Network IP
             : '';  // Production (same domain)
 
         const API_URL = `${API_BASE}/api/alerts`;
@@ -463,7 +471,7 @@
             btn.disabled = true;
             text.textContent = 'Refreshing...';
             await loadCheckIns();
-            text.textContent = '🔄 Refresh';
+            text.textContent = '&#8635; Refresh';
             btn.disabled = false;
         });
 

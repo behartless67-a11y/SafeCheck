@@ -1,7 +1,9 @@
 // Configuration
 // Auto-detect API URL based on environment
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname.includes('192.168') || window.location.hostname.includes('172.')
-    ? 'http://172.18.8.179:3000'  // Local development
+const API_BASE = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000'  // Local development
+    : window.location.hostname.includes('192.168') || window.location.hostname.includes('172.')
+    ? `http://${window.location.hostname}:3000`  // Network IP
     : '';  // Production (same domain)
 
 const CONFIG = {

@@ -7,6 +7,9 @@ try {
   kv = null;
 }
 
+// Use global in-memory storage if available (for local dev server)
+const getInMemoryAlerts = () => global.inMemoryAlerts || [];
+
 module.exports = async (req, res) => {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -34,8 +37,10 @@ module.exports = async (req, res) => {
       // Sort by timestamp (most recent first)
       alerts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     } else {
-      // Return empty array with note about in-memory storage
-      alerts = [];
+      // Use in-memory storage
+      alerts = getInMemoryAlerts();
+      // Sort by timestamp (most recent first)
+      alerts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     }
 
     res.json({ alerts });

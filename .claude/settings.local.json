@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git clone:*)",
+      "Bash(rm:*)",
+      "Bash(cmd //c install.bat)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(ls:*)",
+      "Bash(npm install:*)",
+      "Bash(vercel dev:*)",
+      "Bash(node server.js:*)",
+      "Bash(node generate-dummy-data.js:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd accountability report feature and prepare for Vercel deployment\n\n- Add accountability.html dashboard showing checked-in vs not-checked-in users\n- Add api/accountability.js endpoint for accountability data\n- Add api/load-staff.js to load staff/faculty lists from CSV files\n- Update API endpoints to support both KV and in-memory storage\n- Replace emojis with Unicode symbols throughout UI\n- Add staff and faculty CSV files for categorization\n- Create server.js for local development\n- Create generate-dummy-data.js for testing\n- Update vercel.json with accountability route\n- Add .vercelignore file\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

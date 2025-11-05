@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#232D4B">
+    <title>Batten SafeCheck - Accountability Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Georgia, 'Times New Roman', serif;
+            background: #fafafa;
+            min-height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+
+        /* Background Image */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('garrett-hall-sunset.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            filter: grayscale(100%);
+            z-index: -2;
+        }
+
+        /* Background Overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-img {
+            max-width: 450px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 42px;
+            font-weight: bold;
+            color: #232D4B;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 24px;
+            color: #E57200;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .divider {
+            width: 96px;
+            height: 4px;
+            background: #E57200;
+            margin: 16px auto 24px;
+            border-radius: 2px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: #333;
+            display: inline-block;
+        }
+
+        .nav-tab:hover {
+            background: #f5f5f5;
+            border-color: #232D4B;
+        }
+
+        .nav-tab.active {
+            background: #232D4B;
+            color: white;
+            border-color: #232D4B;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(35, 45, 75, 0.1);
+            border: 1px solid rgba(229, 114, 0, 0.1);
+        }
+
+        .stat-card.success {
+            border-left: 4px solid #28a745;
+        }
+
+        .stat-card.danger {
+            border-left: 4px solid #dc3545;
+        }
+
+        .stat-card.info {
+            border-left: 4px solid #17a2b8;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #232D4B;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(35, 45, 75, 0.15);
+            border: 1px solid rgba(229, 114, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #E57200;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #232D4B;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #232D4B;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #232D4B;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1a2338;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(35, 45, 75, 0.3);
+        }
+
+        .btn-secondary {
+            background: #E57200;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #cc6600;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(35, 45, 75, 0.05);
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #232D4B;
+            border-bottom: 2px solid #E57200;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            color: #333;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: rgba(229, 114, 0, 0.05);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-staff {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-student {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .time {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(35, 45, 75, 0.1);
+            border-radius: 50%;
+            border-top-color: #E57200;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .user-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .user-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-item:hover {
+            background: rgba(229, 114, 0, 0.05);
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #232D4B;
+            margin-bottom: 4px;
+        }
+
+        .user-id {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .user-status {
+            font-size: 12px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 32px;
+            }
+
+            .subtitle {
+                font-size: 18px;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="bat_rgb.png" alt="Batten School Logo" class="logo-img">
+            <div class="logo">SafeCheck</div>
+            <div class="subtitle">Emergency Accountability Report</div>
+            <div class="divider"></div>
+        </div>
+
+        <div class="nav-tabs">
+            <a href="admin.html" class="nav-tab">&#9776; Check-ins Dashboard</a>
+            <a href="accountability.html" class="nav-tab active">&#9745; Accountability Report</a>
+            <a href="index.html" class="nav-tab">&#8592; Back to Check-in</a>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading accountability report...</p>
+        </div>
+
+        <div id="content" style="display: none;">
+            <!-- Overall Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card success">
+                    <div class="stat-label">&#10004; Checked In</div>
+                    <div class="stat-value" id="totalCheckedIn">0</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-label">&#10006; Not Checked In</div>
+                    <div class="stat-value" id="totalNotCheckedIn">0</div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-label">Total Community</div>
+                    <div class="stat-value" id="totalUsers">0</div>
+                </div>
+            </div>
+
+            <!-- Staff/Faculty Section -->
+            <div class="card">
+                <div class="section-header">
+                    <div class="section-title">
+                        &#9733; Staff & Faculty
+                        <span style="font-size: 16px; color: #666; margin-left: 10px;">
+                            (<span id="staffCheckedIn">0</span> of <span id="staffTotal">0</span> checked in)
+                        </span>
+                    </div>
+                </div>
+
+                <div class="grid-layout">
+                    <!-- Checked In Staff -->
+                    <div>
+                        <h3 style="color: #28a745; margin-bottom: 15px; font-size: 18px;">
+                            &#10004; Checked In (<span id="staffCheckedInCount">0</span>)
+                        </h3>
+                        <div id="staffCheckedInList" class="user-list"></div>
+                    </div>
+
+                    <!-- Not Checked In Staff -->
+                    <div>
+                        <h3 style="color: #dc3545; margin-bottom: 15px; font-size: 18px;">
+                            &#10006; Not Checked In (<span id="staffNotCheckedInCount">0</span>)
+                        </h3>
+                        <div id="staffNotCheckedInList" class="user-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students Section -->
+            <div class="card">
+                <div class="section-header">
+                    <div class="section-title">
+                        &#9998; Students
+                        <span style="font-size: 16px; color: #666; margin-left: 10px;">
+                            (<span id="studentsCheckedIn">0</span> of <span id="studentsTotal">0</span> checked in)
+                        </span>
+                    </div>
+                </div>
+
+                <div class="grid-layout">
+                    <!-- Checked In Students -->
+                    <div>
+                        <h3 style="color: #28a745; margin-bottom: 15px; font-size: 18px;">
+                            &#10004; Checked In (<span id="studentsCheckedInCount">0</span>)
+                        </h3>
+                        <div id="studentsCheckedInList" class="user-list"></div>
+                    </div>
+
+                    <!-- Not Checked In Students -->
+                    <div>
+                        <h3 style="color: #dc3545; margin-bottom: 15px; font-size: 18px;">
+                            &#10006; Not Checked In (<span id="studentsNotCheckedInCount">0</span>)
+                        </h3>
+                        <div id="studentsNotCheckedInList" class="user-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <button class="btn btn-primary" id="refreshBtn">&#8635; Refresh Report</button>
+                <button class="btn btn-secondary" id="exportBtn">&#8595; Export to CSV</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-detect API URL based on environment
+        const API_BASE = window.location.hostname === 'localhost'
+            ? 'http://localhost:3000'
+            : window.location.hostname.includes('192.168') || window.location.hostname.includes('172.')
+            ? `http://${window.location.hostname}:3000`
+            : '';
+
+        const API_URL = `${API_BASE}/api/accountability`;
+        let reportData = null;
+
+        // Load accountability report
+        async function loadReport() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                reportData = data;
+                updateUI(data);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+            } catch (error) {
+                console.error('Error loading report:', error);
+                document.getElementById('loading').innerHTML = `
+                    <div class="empty-state">
+                        <p style="color: #dc3545; font-size: 18px;">Failed to load accountability report</p>
+                        <p>Make sure the backend server is running.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Update UI with data
+        function updateUI(data) {
+            const { stats, users } = data;
+
+            // Update overall stats
+            document.getElementById('totalCheckedIn').textContent = stats.totalCheckedIn;
+            document.getElementById('totalNotCheckedIn').textContent = stats.totalNotCheckedIn;
+            document.getElementById('totalUsers').textContent = stats.totalUsers;
+
+            // Update staff stats
+            document.getElementById('staffCheckedIn').textContent = stats.staff.checkedIn;
+            document.getElementById('staffTotal').textContent = stats.staff.total;
+            document.getElementById('staffCheckedInCount').textContent = stats.staff.checkedIn;
+            document.getElementById('staffNotCheckedInCount').textContent = stats.staff.notCheckedIn;
+
+            // Update student stats
+            document.getElementById('studentsCheckedIn').textContent = stats.students.checkedIn;
+            document.getElementById('studentsTotal').textContent = stats.students.total;
+            document.getElementById('studentsCheckedInCount').textContent = stats.students.checkedIn;
+            document.getElementById('studentsNotCheckedInCount').textContent = stats.students.notCheckedIn;
+
+            // Render lists
+            renderUserList('staffCheckedInList', users.staff.checkedIn, true);
+            renderUserList('staffNotCheckedInList', users.staff.notCheckedIn, false);
+            renderUserList('studentsCheckedInList', users.students.checkedIn, true);
+            renderUserList('studentsNotCheckedInList', users.students.notCheckedIn, false);
+        }
+
+        // Render user list
+        function renderUserList(elementId, users, hasCheckedIn) {
+            const container = document.getElementById(elementId);
+
+            if (users.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="padding: 20px;"><em style="color: #999;">None</em></div>';
+                return;
+            }
+
+            container.innerHTML = users.map(user => {
+                let statusHTML = '';
+                if (hasCheckedIn) {
+                    const time = new Date(user.timestamp).toLocaleString();
+                    statusHTML = `
+                        <div class="user-status">
+                            <strong>${user.location}</strong><br>
+                            <span class="time">${time}</span>
+                            ${user.notes ? `<br><em style="font-size: 11px;">${user.notes}</em>` : ''}
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="user-item">
+                        <div class="user-info">
+                            <div class="user-name">${user.name}</div>
+                            <div class="user-id">${user.uid} • ${user.email}</div>
+                            ${statusHTML}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Refresh button
+        document.getElementById('refreshBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('refreshBtn');
+            btn.disabled = true;
+            btn.textContent = 'Refreshing...';
+            await loadReport();
+            btn.textContent = '🔄 Refresh Report';
+            btn.disabled = false;
+        });
+
+        // Export CSV
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            if (!reportData) {
+                alert('No data to export');
+                return;
+            }
+
+            const { users } = reportData;
+            const rows = [];
+
+            // Header
+            rows.push(['Category', 'Status', 'Name', 'Computing ID', 'Email', 'Location', 'Notes', 'Timestamp']);
+
+            // Staff - Checked In
+            users.staff.checkedIn.forEach(u => {
+                rows.push(['Staff', 'Checked In', u.name, u.uid, u.email, u.location, u.notes || '', u.timestamp]);
+            });
+
+            // Staff - Not Checked In
+            users.staff.notCheckedIn.forEach(u => {
+                rows.push(['Staff', 'Not Checked In', u.name, u.uid, u.email, '', '', '']);
+            });
+
+            // Students - Checked In
+            users.students.checkedIn.forEach(u => {
+                rows.push(['Student', 'Checked In', u.name, u.uid, u.email, u.location, u.notes || '', u.timestamp]);
+            });
+
+            // Students - Not Checked In
+            users.students.notCheckedIn.forEach(u => {
+                rows.push(['Student', 'Not Checked In', u.name, u.uid, u.email, '', '', '']);
+            });
+
+            const csv = rows.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `batten-accountability-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        });
+
+        // Auto-refresh every 30 seconds
+        setInterval(loadReport, 30000);
+
+        // Initial load
+        loadReport();
+    </script>
+</body>
+</html>

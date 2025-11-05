@@ -5,8 +5,6 @@ const authorizedUsers = loadBattenUsers();
 
 // Try to load KV, fallback to in-memory if not available
 let kv;
-let inMemoryAlerts = [];
-let alertCount = 0;
 
 try {
   kv = require('@vercel/kv').kv;
@@ -14,6 +12,14 @@ try {
   console.warn('KV not available, using in-memory storage');
   kv = null;
 }
+
+// Use global in-memory storage if available (for local dev server)
+const getInMemoryAlerts = () => {
+  if (!global.inMemoryAlerts) global.inMemoryAlerts = [];
+  return global.inMemoryAlerts;
+};
+const getAlertCount = () => global.alertCount || 0;
+const setAlertCount = (count) => { global.alertCount = count; };
 
 module.exports = async (req, res) => {
   // Enable CORS
@@ -74,8 +80,9 @@ module.exports = async (req, res) => {
       await kv.set('alert_count', newAlertId);
     } else {
       // Fallback to in-memory storage
-      alertCount++;
-      newAlertId = alertCount;
+      const currentCount = getAlertCount();
+      newAlertId = currentCount + 1;
+      setAlertCount(newAlertId);
 
       const alert = {
         id: newAlertId,
@@ -88,7 +95,7 @@ module.exports = async (req, res) => {
         receivedAt: new Date().toISOString()
       };
 
-      inMemoryAlerts.push(alert);
+      getInMemoryAlerts().push(alert);
     }
 
     console.log(`Check-in recorded for ${name} at ${location} (ID: ${newAlertId})`);
